@@ -108,9 +108,13 @@ bot.command('get', ctx => {
 						return ctx.reply(UserMessage.error(ctx.chat.id)
 							, { reply_to_message_id: ctx.message.message_id });
 					}
-					const msg = isNewCutie ? UserMessage.newCutie(member.user.username)
-						: UserMessage.cutie(member.user.username);
-					return ctx.reply(msg, { reply_to_message_id: ctx.message.message_id });
+					if (isNewCutie) {
+						return ctx.reply(UserMessage.newCutie(member.user.username)
+							, { reply_to_message_id: ctx.message.message_id });
+					} else {
+						return ctx.replyWithMarkdown(UserMessage.cutie(member.user.username)
+							, { reply_to_message_id: ctx.message.message_id });
+					}
 			})
 			.catch(err => {
 				return ctx.reply(UserMessage.error(ctx.chat.id)

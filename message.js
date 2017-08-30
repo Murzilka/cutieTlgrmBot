@@ -59,7 +59,7 @@ class Message {
 	}
 
 	cutie(username) {
-		return `Лапусечка дня @${username}`;
+		return `Лапусечка дня *${username}*`;
 	}
 
 }
