@@ -183,3 +183,25 @@ module.exports.setCutie = function (chatId, userId, date) {
 		return result;
 	});
 };
+
+/**
+ *  Получение статистики по чату
+ *
+ * @param {Number} chatId - chat id
+ * @returns {Array} - отсортированный массив объектов вида { userdId, count }
+ */
+module.exports.getStats = function (chatId) {
+	const date = new Date();
+	return Cutie.findAll({ where: { chatId: chatId } })
+		.then(arr => {
+			//const shortArr = arr.map(o => o.userId);
+			let stats = {};
+			for (let i in arr) {
+				if (!stats[arr[i].userId]) stats[arr[i].userId] = 1;
+				else ++stats[arr[i].userId];
+			}
+			let compressedArr = [];
+			for (let i in stats) compressedArr.push({ userId: i, count: stats[i] });
+			return compressedArr.sort((a, b) => b.count - a.count);
+		});
+};

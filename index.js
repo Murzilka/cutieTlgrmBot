@@ -85,7 +85,7 @@ bot.command('get', ctx => {
 				}))
 				.then(() => ctx.reply(UserMessage.filterBad()))
 				.then(() => new Promise((resolve, reject) => {
-					setTimeout(() => { resolve(); }, 3000);
+					setTimeout(() => { resolve(); }, 5000);
 				}))
 				.then(() => ctx.reply(UserMessage.filterBad2()))
 				.then(() => new Promise((resolve, reject) => {
@@ -93,7 +93,7 @@ bot.command('get', ctx => {
 				}))
 				.then(() => ctx.reply(UserMessage.filterGood()))
 				.then(() => new Promise((resolve, reject) => {
-					setTimeout(() => { resolve(); }, 1000);
+					setTimeout(() => { resolve(); }, 2000);
 				}))
 				.then(() => election.electionInChat(ctx.chat.id, date));
 		})
@@ -120,6 +120,40 @@ bot.command('get', ctx => {
 				return ctx.reply(UserMessage.error(ctx.chat.id)
 					, { reply_to_message_id: ctx.message.message_id });
 			});
+		});
+});
+
+/** stats - Посмотреть статистику */
+bot.command('stats', ctx => {
+	let currentCutie;
+	let memberArr = [];
+	return storage.getCutie(ctx.chat.id, new Date())
+		.then(cutieId => {
+			currentCutie = cutieId;
+			return storage.getStats(ctx.chat.id)
+				.then(statArr => {
+				const arr = statArr.map(o => ctx.getChatMember(o.userId)
+					.then(member => {
+						let userObj = null;
+						if (member && member.user && member.user.username) {
+							userObj = { user: member.user, count: o.count };
+							memberArr.push(userObj);
+						}
+						return userObj;
+					}));
+				return Promise.all(arr);
+			});
+		})
+		.then(arr => {
+			arr = arr.filter(o => o);
+			/** @todo возможно превышение максимальной длины */
+			let str = '';
+			for (let i in arr) {
+				const isCurrent = currentCutie === arr[i].user.id;
+				str += (isCurrent ? '*' : '') + arr[i].user.username + (isCurrent ? '*' : '')
+					+ ': ' + arr[i].count + "\n";
+			}
+			return ctx.replyWithMarkdown(str, { reply_to_message_id: ctx.message.message_id });
 		});
 });
 
