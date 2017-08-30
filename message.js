@@ -43,15 +43,15 @@ class Message {
 	}
 
 	filterBad() {
-		return 'Отсеиваем гавнюков...';
+		return 'Отсеиваю говнюков...';
 	}
 
 	filterBad2() {
-		return 'Отсеиваем тех, кто недостоин...';
+		return 'Отсеиваю тех, кто недостоин...';
 	}
 
 	filterGood() {
-		return 'Выбираем из оставшейся пары...';
+		return 'Выбираю из оставшейся пары...';
 	}
 
 	newCutie(username) {
