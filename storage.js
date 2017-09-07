@@ -184,17 +184,10 @@ module.exports.setCutie = function (chatId, userId, date) {
 	});
 };
 
-/**
- *  Получение статистики по чату
- *
- * @param {Number} chatId - chat id
- * @returns {Array} - отсортированный массив объектов вида { userdId, count }
- */
 module.exports.getStats = function (chatId) {
 	const date = new Date();
 	return Cutie.findAll({ where: { chatId: chatId } })
 		.then(arr => {
-			//const shortArr = arr.map(o => o.userId);
 			let stats = {};
 			for (let i in arr) {
 				if (!stats[arr[i].userId]) stats[arr[i].userId] = 1;
@@ -204,4 +197,18 @@ module.exports.getStats = function (chatId) {
 			for (let i in stats) compressedArr.push({ userId: i, count: stats[i] });
 			return compressedArr.sort((a, b) => b.count - a.count);
 		});
+};
+
+module.exports.migrate = function (newId, oldId) {
+	return sequelize.transaction()
+		.then(t => Chat.update({ chatId: newId }, { where: { chatId: oldId } }, { transaction: t })
+			.then(() => Player.update({ chatId: newId }, { where: { chatId: oldId } }, { transaction: t }))
+			.then(() => Cutie.update({ chatId: newId }, { where: { chatId: oldId } }, { transaction: t }))
+			.then(() => t.commit())
+			.catch(err => {
+				console.log(err);
+				t.rollback();
+				throw err;
+			})
+	);
 };
